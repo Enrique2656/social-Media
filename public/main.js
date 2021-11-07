@@ -10,9 +10,8 @@ Array.from(thumbUp).forEach(function(element) {
           method: 'put',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            'name': name,
-            'msg': msg,
-            'thumbUp':thumbUp
+            'thumbUp':thumbUp,
+            'id':id
           })
         })
         .then(response => {
