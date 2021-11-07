@@ -1,5 +1,6 @@
 var thumbUp = document.getElementsByClassName("fa-thumbs-up");
 var trash = document.getElementsByClassName("fa-trash");
+var commentButton = document.getElementsByClassName("sendComment");
 
 Array.from(thumbUp).forEach(function(element) {
       element.addEventListener('click', function(){
@@ -22,6 +23,26 @@ Array.from(thumbUp).forEach(function(element) {
           window.location.reload(true)
         })
       });
+});
+// nisha helped me get my comments working
+Array.from(commentButton).forEach(function (element) {
+  element.addEventListener("click", function () {
+    const comment = document.querySelector(".userComment").value;
+    const postId = element.dataset.value;
+
+    console.log("postId = " + postId);
+    console.log(comment);
+
+    fetch("submit", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        comment: comment,
+        postId: postId,
+      }),
+    });
+    window.location.reload(true);
+  });
 });
 
 Array.from(trash).forEach(function(element) {

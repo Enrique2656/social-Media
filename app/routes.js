@@ -67,10 +67,18 @@ app.get('/page/:id', isLoggedIn, function(req, res) {
 // post routes
 app.post('/makePost', upload.single('file-to-upload'), (req, res) => {
   let user = req.user._id
-  db.collection('posts').save({caption: req.body.caption, img: 'images/uploads/' + req.file.filename, postedBy: user, thumbUp: 0}, (err, result) => {
-    if (err) return console.log(err)
-    console.log('saved to database')
-    res.redirect('/profile')
+  db.collection('posts').save(
+    {
+      caption: req.body.caption, 
+      img: 'images/uploads/' + req.file.filename, 
+      postedBy: user,
+      thumbUp: 0,
+      comment: []
+    }, 
+    (err, result) => {
+      if (err) return console.log(err)
+      console.log('saved to database')
+      res.redirect('/profile')
   })
 })
 
@@ -100,6 +108,40 @@ app.post('/makePost', upload.single('file-to-upload'), (req, res) => {
         res.send(result)
       })
     })
+
+    app.post("/post/comments/submit", (req, res) => {
+      let user = req.user;
+      let time = new Date().toLocaleString();
+      const postId = ObjectId(req.body.postId);
+  
+      const newTestObject = {
+        commentBy: user.local.email,
+        comment: req.body.comment,
+        likes: 0,
+        liked: false,
+        time,
+        postId: postId,
+      };
+  
+      console.log(`POSTID = ${postId}`);
+  
+      db.collection("posts").findOneAndUpdate(
+        { _id: postId },
+        {
+          $push: {
+            comment: newTestObject,
+          },
+        },
+        {
+          sort: { _id: -1 },
+          upsert: true,
+        },
+        (err, result) => {
+          if (err) return console.log(err);
+          res.redirect("/feed");
+        }
+      );
+    });
 
     app.delete('/messages', (req, res) => {
       db.collection('messages').findOneAndDelete({name: req.body.name, msg: req.body.msg}, (err, result) => {
